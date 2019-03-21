@@ -119,7 +119,7 @@ class NAIP(Datasource):
 
     def search(self, spatial, temporal=None, properties=None, limit=10, **kwargs):
         stac_query = STACQuery(spatial, temporal, properties)
-        candidates = stac_query.check_spatial('naip')
+        candidates = stac_query.check_spatial(self.__class__.__name__)
         candidates = [{'key': y, 'utm': x['utm']} for x in candidates for y in x['keys']][:limit]
 
         for idx, candidate in enumerate(candidates):
