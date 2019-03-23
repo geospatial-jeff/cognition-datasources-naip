@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/geospatial-jeff/cognition-datasources-naip.svg?style=svg)](https://circleci.com/gh/geospatial-jeff/cognition-datasources-naip)
+
 ## NAIP
 
 | Parameter | Status |
