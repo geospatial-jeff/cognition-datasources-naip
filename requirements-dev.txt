@@ -1,4 +1,4 @@
-boto3>=1.9.118
+boto3
 git+https://github.com/geospatial-jeff/cognition-datasources.git
 git+https://github.com/geospatial-jeff/stac-validator.git
 shapely==1.6.4.post2
