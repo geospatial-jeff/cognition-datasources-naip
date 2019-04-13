@@ -139,7 +139,7 @@ class NAIP(Datasource):
             response = db.spatial_query({"type": "Feature", "geometry": stac_query.spatial})
             candidates = [{'key': x, 'utm': utm_epsg} for i in [item['keys'] for item in response] for x in i]
 
-
+        searches = 0
         for idx, candidate in enumerate(candidates):
             asset = NAIPAsset(candidate)
             acquisition_date = asset.filename.split('_')[5]
@@ -150,11 +150,6 @@ class NAIP(Datasource):
                 if not stac_query.check_temporal(acquisition_date_time):
                     continue
 
-            # if properties:
-            #     if 'eo:instrument' in list(properties):
-            #         candidate.update({'eo:instrument': properties['eo:instrument']['eq']})
-            #     if not stac_query.check_properties(asset):
-            #         continue
             if properties:
                 if 'eo:instrument' in list(properties):
                     candidate.update({'eo:instrument': properties.pop('eo:instrument')['eq']})
@@ -181,7 +176,9 @@ class NAIP(Datasource):
             md_key_splits[-1] = '_'.join(asset.filename.split('_')[:-1]) + '.txt'
             candidate.update({'md_key': '/'.join(md_key_splits)})
 
-            self.manifest.searches.append([self, candidate])
+            if searches < limit:
+                self.manifest.searches.append([self, candidate])
+                searches += 1
 
     def execute(self, query):
         # Base STAC Item
