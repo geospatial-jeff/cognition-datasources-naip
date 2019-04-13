@@ -2,7 +2,7 @@ import os
 import subprocess
 from multiprocessing.pool import ThreadPool
 from osgeo import gdal, osr, ogr
-from rtree import index
+
 
 rtree_location = 'naip_rtree'
 naip_static_location = 'static'
@@ -23,7 +23,7 @@ def download_coverages():
     m = ThreadPool()
     m.map(download_shapefile, keys)
 
-def build_database(shapefile=None):
+def build_database(outfile):
     # Create transformer from NAD 83 to WGS 84
     in_srs = osr.SpatialReference()
     in_srs.ImportFromEPSG(4269)
@@ -63,30 +63,22 @@ def build_database(shapefile=None):
         else:
             print("Bad shapefile: {}".format(file))
 
-    # Build index
-    print("Building Rtree index")
-    idx = index.Rtree(rtree_location)
-    i = 0
-    for quad in d:
-        geometry = ogr.CreateGeometryFromWkt(d[quad]['geometry']).GetEnvelope()
-        keys = d[quad]['object']
-        idx.insert(i, (geometry[0], geometry[2], geometry[1], geometry[3]), obj=keys)
-        i+=1
-
     # Create shapefile
-    if shapefile:
-        print("Creating shapefile")
-        if type(shapefile) == str and shapefile.endswith('.shp'):
-            out_ds = gdal.GetDriverByName('ESRI Shapefile').Create(shapefile,0,0,0)
-            out_lyr = out_ds.CreateLayer('', out_srs, ogr.wkbPolygon)
-            out_lyr.CreateField(ogr.FieldDefn("keys", ogr.OFTString))
-            for quad in d:
-                out_feat = ogr.Feature(out_lyr.GetLayerDefn())
-                out_feat.SetField('keys', str(d[quad]['object']['keys']))
-                geom = ogr.CreateGeometryFromWkt(d[quad]['geometry'])
-                geom.Transform(transformer)
-                out_feat.SetGeometry(geom)
-                out_lyr.CreateFeature(out_feat)
-                out_feat = None
-            out_lyr = None
-            out_ds = None
+    print("Creating geojson")
+    out_ds = gdal.GetDriverByName('GeoJSON').Create(outfile,0,0,0)
+    out_lyr = out_ds.CreateLayer('', out_srs, ogr.wkbPolygon)
+    out_lyr.CreateField(ogr.FieldDefn("keys", ogr.OFTString))
+    out_lyr.CreateField(ogr.FieldDefn("id", ogr.OFTInteger))
+    for idx, quad in enumerate(d):
+        out_feat = ogr.Feature(out_lyr.GetLayerDefn())
+        out_feat.SetField('keys', str(d[quad]['object']['keys']))
+        out_feat.SetField('id', idx)
+        geom = ogr.CreateGeometryFromWkt(d[quad]['geometry'])
+        geom.Transform(transformer)
+        out_feat.SetGeometry(geom)
+        out_lyr.CreateFeature(out_feat)
+        out_feat = None
+    out_lyr = None
+    out_ds = None
+
+build_database('/home/slingshot/Documents/Cognition/cognition-datasources-naip/static/naip_coverage.geojson')

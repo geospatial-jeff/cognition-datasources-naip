@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 
 import boto3
+import utm
 
 from datasources.stac.query import STACQuery
 from datasources.stac.item import STACItem
@@ -118,9 +119,26 @@ class NAIP(Datasource):
         return config
 
     def search(self, spatial, temporal=None, properties=None, limit=10, **kwargs):
+        import sys
+        db_dir = 'spatial-db/lambda_db'
+        if db_dir not in sys.path:
+            sys.path.append(db_dir)
+
+        from db import Database
+
         stac_query = STACQuery(spatial, temporal, properties)
-        candidates = stac_query.check_spatial(self.__class__.__name__)
-        candidates = [{'key': y, 'utm': x['utm']} for x in candidates for y in x['keys']][:limit]
+
+        # Grab UTM zone epsg code
+        xvals = [x[0] for x in stac_query.spatial['coordinates'][0]]
+        yvals = [y[1] for y in stac_query.spatial['coordinates'][0]]
+        centroid = [(min(xvals) + max(xvals)) / 2, (max(yvals) + min(yvals)) / 2]
+        utm_zone = utm.from_latlon(*centroid[::-1])[2]
+        utm_epsg = 26900 + int(utm_zone)
+
+        with Database.load(read_only=True, deployed=True) as db:
+            response = db.spatial_query({"type": "Feature", "geometry": stac_query.spatial})
+            candidates = [{'key': x, 'utm': utm_epsg} for i in [item['keys'] for item in response] for x in i]
+
 
         for idx, candidate in enumerate(candidates):
             asset = NAIPAsset(candidate)
