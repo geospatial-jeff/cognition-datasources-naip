@@ -119,11 +119,6 @@ class NAIP(Datasource):
         return config
 
     def search(self, spatial, temporal=None, properties=None, limit=10, **kwargs):
-        import sys
-        db_dir = 'spatial-db/lambda_db'
-        if db_dir not in sys.path:
-            sys.path.append(db_dir)
-
         from db import Database
 
         stac_query = STACQuery(spatial, temporal, properties)
