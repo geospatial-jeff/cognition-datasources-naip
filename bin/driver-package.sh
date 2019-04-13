@@ -10,7 +10,8 @@ echo "Creating lambda layer"
 
 # Moving python libraries
 mkdir $DEPLOY_DIR/python
-EXCLUDE="boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
+EXCLUDE="urllib3* s3transfer* boto3* botocore* pip* docutils* *.pyc setuptools* wheel* coverage* testfixtures* mock* *.egg-info *.dist-info __pycache__ easy_install.py"
+
 
 EXCLUDES=()
 for E in ${EXCLUDE}
