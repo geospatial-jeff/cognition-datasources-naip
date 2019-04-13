@@ -1,0 +1,7 @@
+db_name: 'naip-coverages'
+config:
+  min_res: 10
+  max_res: 12
+  limit: 100
+  unique_id: 'id'
+  compress: true
