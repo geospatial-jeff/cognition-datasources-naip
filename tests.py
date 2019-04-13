@@ -1,13 +1,3 @@
-import os
-import sys
-
-db_path = '/home/slingshot/Documents/Cognition/cognition-datasources-naip/spatial-db/lambda_db'
-if db_path not in sys.path:
-  sys.path.append(db_path)
-
-os.environ['S2_LIBRARY_PATH'] = '/home/slingshot/Downloads/s2geometry/build/python'
-os.environ['LAMBDA_DB_PATH'] = '/home/slingshot/Documents/Cognition/cognition-datasources-naip/spatial-db/lambda_db/database.fs'
-
 from datasources import tests
 
 from NAIP import NAIP
