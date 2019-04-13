@@ -36,6 +36,8 @@ jobs:
           name: "Setup custom environment variables"
           command: |
             echo 'export LAMBDA_DB_PATH="/root/repo/spatial-db/lambda_db/database.fs"' >> $BASH_ENV
+            echo 'export PYTHONPATH="${PYTHONPATH}:/root/repo/spatial-db/lambda_db/"' >> $BASH_ENV
+
 
 
 #      - save_cache:
