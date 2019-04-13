@@ -32,10 +32,10 @@ jobs:
           command: |
             pip install -r requirements-dev.txt
 
-#      - run:
-#          name: "Setup custom environment variables"
-#          command: |
-#            echo 'export HELLO="WORLD"' >> $BASH_ENV
+      - run:
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export HELLO="WORLD"' >> $BASH_ENV
 
 
 #      - save_cache:
@@ -51,6 +51,8 @@ jobs:
       - run:
           name: run tests
           command: |
+            ls
+            pwd
             python3 -m unittest tests.py
 
       - store_artifacts:
