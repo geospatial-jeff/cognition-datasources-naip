@@ -5,9 +5,7 @@ COPY requirements*.txt ./
 # Paths to things
 ENV \
     PROD_LIBS=/build/prod \
-    DEV_LIBS=/build/dev \
-    AWS_DEFAULT_REGION=us-east-1 \
-    LAMBDA_DB_PATH=/home/cognition-datasources/spatial-db/lambda_db/database.fs
+    DEV_LIBS=/build/dev
 
 # Add libraries to python path
 ENV \
